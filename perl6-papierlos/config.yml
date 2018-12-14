@@ -1,0 +1,12 @@
+store:
+  projects: /tmp/store
+  unprocessed: /tmp/unprocessed
+projects:
+  schule:
+    subdir-structure:
+      - fach
+      - jahrgangsstufe
+  unterlagen:
+    subdir-structure:
+      - jahr
+      - monat
