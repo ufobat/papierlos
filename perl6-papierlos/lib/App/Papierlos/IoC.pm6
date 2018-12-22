@@ -4,6 +4,8 @@ use IoC;
 use YAMLish;
 use App::Papierlos::Project;
 use App::Papierlos::Projects;
+use App::Papierlos::Cro::Routes;
+use App::Papierlos::Cro::Runner;
 
 unit module App::Papierlos::IoC;
 
@@ -15,8 +17,14 @@ our $Container is export = container 'papierlos' => contains {
             with %*ENV<PAPIERLOS_CONFIG> {
                 $configfile = .IO;
             }
+            orwith $*CWD {
+                $configfile = .child('papierlos.yml');
+            }
             orwith %*ENV<HOME> {
                 $configfile = .IO.child('.papierlos.yml');
+            }
+            orwith %*ENV<HOME> {
+                $configfile = .IO.child('.config/papierlos.yml');
             }
             die "dont know the path to configfile" unless $configfile.defined;
             die "could not load configfile $configfile" unless $configfile.e;
@@ -60,11 +68,9 @@ our $Container is export = container 'papierlos' => contains {
         block => sub ($service, --> Seq) {
             my %config = $service.param('configuration');
             return gather for %config<projects>.kv -> $name, $project-settings {
-                say $project-settings<subdir-structure>.WHAT;
-                say $project-settings<subdir-structure>.perl;
                 take $name => App::Papierlos::Project::BaseDir.new(
                     base-path => %config<store><projects>.IO.add($name),
-                    subdir-structure => $project-settings<subdir-structure>,
+                    subdir-structure => $project-settings<subdir-structure>.flat,
                 );
             }
         }
@@ -90,6 +96,19 @@ our $Container is export = container 'papierlos' => contains {
                 );
             }
             return App::Papierlos::Projects.new( :%projects );
+        }
+    };
+
+    service 'cro-routes' => {
+        block => sub { App::Papierlos::Cro::Routes::get-routes() },
+    };
+
+    service 'cro-app-runner' => {
+        type => App::Papierlos::Cro::Runner,
+        dependencies => {
+            :application('cro-routes'),
+            # :host( literal('localhost') ),
+            # :port( literal(80) ),
         }
     };
 

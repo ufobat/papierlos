@@ -2,8 +2,9 @@ use v6.c;
 use Test;
 use App::Papierlos::IoC;
 use App::Papierlos::Unprocessed;
-
-plan 4;
+use App::Papierlos::Cro::Routes;
+use App::Papierlos::Cro::Runner;
+use Cro::HTTP::Router;
 
 ok( $Container, 'found a IoC container' );
 
@@ -22,19 +23,31 @@ isa-ok(
 isa-ok(
     $Container.resolve('unprocessed-store'),
     App::Papierlos::Unprocessed,
-    'resolved projects',
+    'resolved unprocessed-store',
 );
 
 isa-ok(
     $Container.resolve('project-base-dirs'),
-    Hash,
-    'resolved project-stores',
+    Seq,
+    'resolved project-base-dirs',
 );
 
 isa-ok(
     $Container.resolve('projects'),
     App::Papierlos::Projects,
     'resolved projects',
+);
+
+isa-ok(
+    $Container.resolve('cro-routes'),
+    Cro::HTTP::Router::RouteSet,
+    'resolved cro-routes'
+);
+
+isa-ok(
+    $Container.resolve('cro-app-runner'),
+    App::Papierlos::Cro::Runner,
+    'resolved cro-app-runner'
 );
 
 done-testing;
