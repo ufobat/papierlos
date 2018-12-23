@@ -5,6 +5,7 @@
   "build-depends" : [ ],
   "depends" : [
     "Cro",
+    "Cro::HTTP",
     "Data::Dump",
     "IoC",
     "YAMLish"

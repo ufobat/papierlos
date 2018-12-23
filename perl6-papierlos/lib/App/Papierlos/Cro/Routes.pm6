@@ -24,19 +24,11 @@ sub get-api-routes(--> Cro::HTTP::Router::RouteSet) {
 
 our sub get-resource-routes() {
     route {
-        get -> {
-            redirect :permanent, '/static';
-        }
         get ->  *@path {
-            say "calling on { @path }";
             static-resource(|@path, :indexes(<index.html>));
         }
     }
 }
-
-# 04Y263
-# 04Y2928 125
-# www.de.eetgroup.com
 
 sub static-resource(*@path, :$mime-types, :@indexes) is export {
     my $resp = $*CRO-ROUTER-RESPONSE //
