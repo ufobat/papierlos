@@ -1,6 +1,6 @@
 use v6.c;
 
-unit module App::Papierlos::Cro::Routes;
+unit class App::Papierlos::Cro::Routes;
 use Cro::HTTP::Router;
 use Cro::HTTP::MimeTypes;
 

@@ -4,7 +4,9 @@ use App::Papierlos::Unprocessed;
 use App::Papierlos::DataSource;
 use App::Papierlos::Yaml;
 
-class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource {
+use StrictClass;
+
+class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
     has Str @.subdir-structure is required;
 
     method !do-tags-match-subdir-structure(%tags --> IO::Path) {

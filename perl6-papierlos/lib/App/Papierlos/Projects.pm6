@@ -4,7 +4,9 @@ use App::Papierlos::DataSource;
 use App::Papierlos::DataStore;
 use App::Papierlos::Unprocessed;
 
-class App::Papierlos::Projects {
+use StrictClass;
+
+class App::Papierlos::Projects does StrictClass {
     has %.projects is required;
 
     method store-file(

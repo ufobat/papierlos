@@ -1,7 +1,6 @@
 use v6.c;
 
 # read/write data source
-
 use App::Papierlos::DataSource;
 
 unit role App::Papierlos::DataStore does App::Papierlos::DataSource;

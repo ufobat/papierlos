@@ -1,6 +1,8 @@
 use v6.c;
 
-unit class App::Papierlos::Cro::Runner;
+use StrictClass;
+
+unit class App::Papierlos::Cro::Runner does StrictClass;
 
 use Cro::Service;
 use Cro::HTTP::Server;
