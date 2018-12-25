@@ -10,7 +10,8 @@
     "IoC",
     "YAMLish",
     "StrictClass",
-    "Shell::Command"
+    "Shell::Command",
+    "Digest::MD5"
   ],
   "description" : "blah blah blah",
   "license" : "Artistic-2.0",

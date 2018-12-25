@@ -5,25 +5,30 @@ unit class App::Papierlos::Cro::Routes does StrictClass;
 use Cro::HTTP::Router;
 use Cro::HTTP::MimeTypes;
 
+has $.unprocessed is required;
+
 method get-routes(--> Cro::HTTP::Router::RouteSet) {
     route {
-        include 'api' => get-api-routes();
-        include get-resource-routes();
+        include 'api' => self!get-api-routes();
+        include self!get-resource-routes();
     }
 }
 
-my sub get-api-routes(--> Cro::HTTP::Router::RouteSet) {
+method !get-api-routes(--> Cro::HTTP::Router::RouteSet) {
     route {
-        get -> 'foo' {
-            content 'text/plain', 'this is a foo';
-        }
         get -> {
             content 'text/plain', 'this is a test';
         }
+        get -> 'unprocessed' {
+            content 'application/json', $.unprocessed.get-all();
+        }
+        get -> 'unprocessed', 'details', Str $id {
+            content 'application/json', $.unprocessed.get-details($id);
+        }
     }
 }
 
-my sub get-resource-routes() {
+method !get-resource-routes() {
     route {
         get ->  *@path {
             static-resource(|@path, :indexes(<index.html>));

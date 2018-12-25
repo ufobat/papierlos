@@ -27,11 +27,11 @@ given $responses.receive -> $r {
    ok body-text($r).chars > 0, 'got some sourcecode';
 }
 
-$source.emit(Cro::HTTP::Request.new(:method<GET>, :target</api/foo>));
+$source.emit(Cro::HTTP::Request.new(:method<GET>, :target</api>));
 given $responses.receive -> $r {
    is $r.status, 200, 'Got 200 response';
    is $r.header('Content-type'), 'text/plain; charset=utf-8', 'Got expected header';
-   is body-text($r), 'this is a foo', 'demo api is working';
+   is body-text($r), 'this is a test', 'demo api is working';
 }
 
 

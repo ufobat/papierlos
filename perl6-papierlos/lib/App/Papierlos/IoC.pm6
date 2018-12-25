@@ -102,7 +102,7 @@ our $Container is export = container 'papierlos' => contains {
     service 'cro-routes' => {
         type => App::Papierlos::Cro::Routes,
         dependencies => {
-
+            :unprocessed('unprocessed-store')
         },
     };
 

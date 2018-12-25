@@ -6,6 +6,6 @@ unit role App::Papierlos::DataSource;
 
 has IO::Path $.base-path is required;
 
-method list-contents(--> List) {
+method list-contents(--> Seq) {
     return $.base-path.dir;
 }
