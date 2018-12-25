@@ -2,12 +2,13 @@ use Test;
 use Cro;
 
 use App::Papierlos::Cro::Routes;
+use App::Papierlos::IoC;
 
 sub body-text(Cro::HTTP::Response $r) {
     $r.body-byte-stream.list.map(*.decode('utf-8')).join
 }
 
-my $app = get-routes;
+my $app = $Container.resolve('cro-routes').get-routes;
 
 my $source = Supplier.new;
 my $responses = $app.transformer($source.Supply).Channel;

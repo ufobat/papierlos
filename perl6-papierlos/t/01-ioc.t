@@ -40,7 +40,7 @@ isa-ok(
 
 isa-ok(
     $Container.resolve('cro-routes'),
-    Cro::HTTP::Router::RouteSet,
+    App::Papierlos::Cro::Routes,
     'resolved cro-routes'
 );
 

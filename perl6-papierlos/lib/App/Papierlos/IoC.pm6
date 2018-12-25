@@ -100,13 +100,16 @@ our $Container is export = container 'papierlos' => contains {
     };
 
     service 'cro-routes' => {
-        block => sub { App::Papierlos::Cro::Routes::get-routes() },
+        type => App::Papierlos::Cro::Routes,
+        dependencies => {
+
+        },
     };
 
     service 'cro-app-runner' => {
         type => App::Papierlos::Cro::Runner,
         dependencies => {
-            :application('cro-routes'),
+            :routes('cro-routes'),
             # :host( literal('localhost') ),
             # :port( literal(80) ),
         }

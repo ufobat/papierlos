@@ -1,17 +1,18 @@
 use v6.c;
+use StrictClass;
 
-unit class App::Papierlos::Cro::Routes;
+unit class App::Papierlos::Cro::Routes does StrictClass;
 use Cro::HTTP::Router;
 use Cro::HTTP::MimeTypes;
 
-our sub get-routes(--> Cro::HTTP::Router::RouteSet) is export {
+method get-routes(--> Cro::HTTP::Router::RouteSet) {
     route {
         include 'api' => get-api-routes();
         include get-resource-routes();
     }
 }
 
-sub get-api-routes(--> Cro::HTTP::Router::RouteSet) {
+my sub get-api-routes(--> Cro::HTTP::Router::RouteSet) {
     route {
         get -> 'foo' {
             content 'text/plain', 'this is a foo';
@@ -22,7 +23,7 @@ sub get-api-routes(--> Cro::HTTP::Router::RouteSet) {
     }
 }
 
-our sub get-resource-routes() {
+my sub get-resource-routes() {
     route {
         get ->  *@path {
             static-resource(|@path, :indexes(<index.html>));
@@ -30,6 +31,7 @@ our sub get-resource-routes() {
     }
 }
 
+# Will be part of Cro in future releases / PR was accepted.
 sub static-resource(*@path, :$mime-types, :@indexes) is export {
     my $resp = $*CRO-ROUTER-RESPONSE //
     die X::Cro::HTTP::Router::OnlyInHandler.new(:what<route>);

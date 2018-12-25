@@ -1,21 +1,21 @@
 use v6.c;
-
 use StrictClass;
+use Cro::Service;
+use Cro::HTTP::Server;
+use App::Papierlos::Cro::Routes;
 
 unit class App::Papierlos::Cro::Runner does StrictClass;
 
-use Cro::Service;
-use Cro::HTTP::Server;
-
 has Int $.port = 2314;
 has Str $.host = 'localhost';
-has $.application is required;
+has App::Papierlos::Cro::Routes $.routes is required;
 
 method run() {
     # Create the HTTP service object
     say "running cro on $.host:$.port";
+    my $application = $.routes.get-routes();
     my Cro::Service $service = Cro::HTTP::Server.new(
-        :$.host, :$.port, :$.application
+        :$.host, :$.port, :$application
     );
 
     # Run it
