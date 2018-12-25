@@ -8,7 +8,9 @@
     "Cro::HTTP",
     "Data::Dump",
     "IoC",
-    "YAMLish"
+    "YAMLish",
+    "StrictClass",
+    "Shell::Command"
   ],
   "description" : "blah blah blah",
   "license" : "Artistic-2.0",
