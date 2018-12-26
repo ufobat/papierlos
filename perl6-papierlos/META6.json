@@ -11,7 +11,8 @@
     "YAMLish",
     "StrictClass",
     "Shell::Command",
-    "Digest::MD5"
+    "Digest::MD5",
+    "MagickWand"
   ],
   "description" : "blah blah blah",
   "license" : "Artistic-2.0",

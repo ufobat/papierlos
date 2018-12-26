@@ -25,6 +25,9 @@ method !get-api-routes(--> Cro::HTTP::Router::RouteSet) {
         get -> 'unprocessed', 'details', Str $id {
             content 'application/json', $.unprocessed.get-details($id);
         }
+        get -> 'unprocessed', 'preview', Str $id {
+            content 'image/jpeg', $.unprocessed.get-preview($id);
+        }
     }
 }
 
