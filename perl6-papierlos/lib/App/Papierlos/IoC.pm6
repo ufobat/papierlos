@@ -60,42 +60,40 @@ our $Container is export = container 'papierlos' => contains {
         }
     };
 
-    service 'project-base-dirs' => {
-        :lifecycle('Singelton'),
-        dependencies => {
-            'configuration' => 'configuration',
-        },
-        block => sub ($service, --> Seq) {
-            my %config = $service.param('configuration');
-            return gather for %config<projects>.kv -> $name, $project-settings {
-                take $name => App::Papierlos::Project::BaseDir.new(
-                    base-path => %config<store><projects>.IO.add($name),
-                    subdir-structure => $project-settings<subdir-structure>.flat,
-                );
-            }
-        }
-    };
+    # service 'project-base-dirs' => {
+    #     :lifecycle('Singelton'),
+    #     dependencies => {
+    #         'configuration' => 'configuration',
+    #     },
+    #     block => sub ($service, --> Seq) {
+    #         my %config = $service.param('configuration');
+    #         return gather for %config<projects>.kv -> $name, $project-settings {
+    #             take $name => App::Papierlos::Project::BaseDir.new(
+    #                 base-path => %config<store><projects>.IO.add($name),
+    #                 subdir-structure => $project-settings<subdir-structure>.flat,
+    #             );
+    #         }
+    #     }
+    # };
 
     service 'projects' => {
         :lifecycle('Singleton'),
         dependencies => {
             'configuration' => 'configuration',
-            'project-base-dirs' => 'project-base-dirs',
             'unprocessed-store' => 'unprocessed-store',
         },
         block => sub ($service, --> App::Papierlos::Projects) {
             my %config = $service.param('configuration');
-            my %project-base-dirs = $service.param('project-base-dirs');
             my $unprocessed = $service.param('unprocessed-store');
 
             my %projects = gather for %config<projects>.kv -> $name, $project-settings {
                 take $name => App::Papierlos::Project.new(
                     :$name,
-                    :$unprocessed,
-                    :basedir(%project-base-dirs{$name})
+                    base-path => %config<store><projects>.IO.add($name),
+                    subdir-structure => $project-settings<subdir-structure>.flat,
                 );
             }
-            return App::Papierlos::Projects.new( :%projects );
+            return App::Papierlos::Projects.new( :%projects, :$unprocessed );
         }
     };
 

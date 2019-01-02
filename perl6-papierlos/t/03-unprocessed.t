@@ -23,20 +23,20 @@ is @contents.elems, 1, 'one item available';
 isa-ok @contents[0], IO::Path, 'it is a file';
 is @contents[0].s, 9, 'which is 9 bytes large';
 
-my (%all, $id);
-%all = $unprocessed.get-all();
-is %all.elems, 1, 'found one item';
-$id = %all.keys[0];
+my (@all, @id);
+@all = $unprocessed.get-all();
+is @all.elems, 1, 'found one item';
+diag @all.perl;
+@id = |@all[0]<path>;
 
-my %details = $unprocessed.get-details($id);
-isa-ok %details, Hash, "found details for $id";
+my %details = $unprocessed.get-details(@id);
+isa-ok %details, Hash, "found details for {{ @id.perl }}";
 ok %details<name>:exists, 'details contain a name';
 ok %details<size>:exists, 'details contain a size';
-ok %details<id>:exists, 'details contain a id';
 is %details<size>, 9, 'size is 9';
-is %details<id>, $id, 'it is the same id';
+is %details<path>, @id, 'it is the same id';
 
-is-deeply %all{$id}, %details, 'information about all contains same details';
+#is-deeply %all{@id[0]}, %details, 'information about all contains same details';
 
 $file1.unlink;
 ok !$file1.e, 'file1.txt was removed';
@@ -44,10 +44,10 @@ my $pdf-file = $tempdir.IO.add('test.pdf');
 $pdf-file.spurt( get-resource('DEMO-PDF-Datei.pdf').slurp(:bin) );
 ok $pdf-file.e, 'demo pdf exists';
 diag $unprocessed.list-contents;
-%all = $unprocessed.get-all();
-is %all.elems, 1, 'found one item';
-$id = %all.keys[0];
-my $image-blob = $unprocessed.get-preview($id);
+@all = $unprocessed.get-all();
+is @all.elems, 1, 'found one item';
+@id = |@all[0]<path>;
+my $image-blob = $unprocessed.get-preview(@id);
 ok $image-blob.defined, 'got a preview image';
 
 $pdf-file.unlink;

@@ -1,6 +1,5 @@
 use v6.c;
 
-use App::Papierlos::DataSource;
 use App::Papierlos::DataStore;
 use App::Papierlos::Unprocessed;
 
@@ -8,6 +7,7 @@ use StrictClass;
 
 class App::Papierlos::Projects does StrictClass {
     has %.projects is required;
+    has $.unprocessed is required;
 
     method store-file(
         IO::Path:D $sourcefile,

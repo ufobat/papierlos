@@ -6,66 +6,67 @@ use MagickWand;
 
 unit class App::Papierlos::Unprocessed does App::Papierlos::DataStore does StrictClass;
 
-has %!md5-to-file;
-has %!file-to-md5;
-has $!md5 = Digest::MD5.new();
-
-sub to-preview(Str:D $name --> Str) { $name ~ '.jpg' }
-
-method get-all( --> Hash) {
-    self!update-caches;
-
-    my %all;
-    for %!md5-to-file.keys -> $id {
-        %all{$id} = self.get-details($id);
-    }
-    return %all;
+sub to-preview($file) {
+    my $name = $file.basename ~ '.jpg';
+    my $parent = $file.parent;
+    return $parent.add($name);
 }
-
-method !update-caches() {
-    my %new-md5-to-file;
-    my %new-file-to-md5;
-    for self.list-contents() {
-        my $name = .absolute;
-        my $md5sum = %!file-to-md5{$name};
-        unless $md5sum {
-            $md5sum = $!md5.md5_hex($name);
-            %new-file-to-md5{$name} = $md5sum;
-        }
-        %new-md5-to-file{$md5sum} = $name;
-    }
-    %!md5-to-file = %new-md5-to-file;
-    %!file-to-md5 = %new-file-to-md5;
-}
-
-method get-details(Str $id --> Hash) {
-    my $name = %!md5-to-file{$id};
-    die "could not find $id" unless $name.defined;
-    my $file = $name.IO; 
+sub to-web-response(@path, IO $path) {
+    my $name = $path.basename;
+    my $type = 'dir' if $path.d;
+    my $size = 0;
+    if $path.f {
+        $type = 'file',
+        $size = $path.s;
+    };
+    return unless $type;
     return {
-        name => $file.basename,
-        size => $file.s,
-        id   => $id,
+        :$type,
+        :$name,
+        :$size,
+        :path(|@path, $name),
     };
 }
 
-method get-preview(Str $id --> Blob) {
-    my $name = %!md5-to-file{$id};
-    die "could not find $id" unless $name.defined;
-    my $file = $name.IO;
-    my $jpg = to-preview($name).IO;
+multi method get-all( --> Seq) {
+    self.get-all(Array[Str].new);
+}
+multi method get-all(@path --> Seq) {
+    my &convert = &to-web-response.assuming(@path);
+    return self.list-contents(@path).map(&convert).grep(*.so);
+}
+
+method get-details(@path --> Hash) {
+    my $file = self.get-content(@path);
+    return {
+        name => $file.basename,
+        size => $file.s,
+        :path(@path),
+    };
+}
+
+method get-preview(@path --> Blob) {
+    my $file = self.get-content(@path);
+    my $jpg = to-preview($file);
     unless $jpg.e {
         my $w = MagickWand.new;
         LEAVE {
             $w.cleanup if $w.defined;
         }
         unless
-            $w.read($name) and
+            $w.read($file.absolute) and
             $w.adaptive-resize(0.25) and
-            $w.write($jpg.absolute) {
+            $w.write($jpg.absolute)
+        {
+            my $name = @path.join: '/';
             die "could not create preview for $name";
         }
     }
     die 'preview file was not generated' unless $jpg.e;
     return $jpg.slurp(:bin)
+}
+
+method add-new-pdf(@path, Blob $content) {
+    die 'can only store pdfs' unless @path[*-1] ~~ m:i/ '.pdf' $ /;
+    self.add-content(@path, $content);
 }

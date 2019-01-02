@@ -26,11 +26,11 @@ isa-ok(
     'resolved unprocessed-store',
 );
 
-isa-ok(
-    $Container.resolve('project-base-dirs'),
-    Seq,
-    'resolved project-base-dirs',
-);
+# isa-ok(
+#     $Container.resolve('project-base-dirs'),
+#     Seq,
+#     'resolved project-base-dirs',
+# );
 
 isa-ok(
     $Container.resolve('projects'),
