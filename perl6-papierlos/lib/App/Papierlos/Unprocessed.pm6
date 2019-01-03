@@ -4,7 +4,9 @@ use StrictClass;
 use Digest::MD5;
 use MagickWand;
 
-unit class App::Papierlos::Unprocessed does App::Papierlos::DataStore does StrictClass;
+unit class App::Papierlos::Unprocessed does StrictClass;
+
+has App::Papierlos::DataStore $.datastore is required;
 
 sub to-preview($file) {
     my $name = $file.basename ~ '.jpg';
@@ -33,11 +35,11 @@ multi method get-all( --> Seq) {
 }
 multi method get-all(@path --> Seq) {
     my &convert = &to-web-response.assuming(@path);
-    return self.list-contents(@path).map(&convert).grep(*.so);
+    return $.datastore.list-contents(@path).map(&convert).grep(*.so);
 }
 
 method get-details(@path --> Hash) {
-    my $file = self.get-content(@path);
+    my $file = $.datastore.get-content(@path);
     return {
         name => $file.basename,
         size => $file.s,
@@ -47,7 +49,7 @@ method get-details(@path --> Hash) {
 }
 
 method get-preview(@path --> Blob) {
-    my $file = self.get-content(@path);
+    my $file = $.datastore.get-content(@path);
     my $jpg = to-preview($file);
     unless $jpg.e {
         my $w = MagickWand.new;
@@ -69,5 +71,5 @@ method get-preview(@path --> Blob) {
 
 method add-new-pdf(@path, Blob $content) {
     die 'can only store pdfs' unless @path[*-1] ~~ m:i/ '.pdf' $ /;
-    self.add-content(@path, $content);
+    $.datastore.add-content(@path, $content);
 }

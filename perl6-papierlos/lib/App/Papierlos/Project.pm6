@@ -6,8 +6,9 @@ use App::Papierlos::Yaml;
 
 use StrictClass;
 
-unit class App::Papierlos::Project does App::Papierlos::DataStore does StrictClass;
+unit class App::Papierlos::Project does StrictClass;
 
+has App::Papierlos::DataStore $.datastore is required;
 has Str $.name is required;
 has Str @.subdir-structure is required;
 
@@ -38,9 +39,8 @@ multi method get-all( --> Seq) {
 }
 multi method get-all(@path --> Seq) {
     my &convert = &to-web-response.assuming(@path);
-    return self.list-contents(@path).map(&convert).grep(*.so);
+    return $.datastore.list-contents(@path).map(&convert).grep(*.so);
 }
-
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
 #     has Str @.subdir-structure is required;

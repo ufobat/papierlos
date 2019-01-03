@@ -52,12 +52,19 @@ our $Container is export = container 'papierlos' => contains {
         dependencies => {
             'configuration' => 'configuration',
         },
-        block => sub ($service, --> App::Papierlos::Unprocessed) {
+        block => sub ($service, --> App::Papierlos::DataStore) {
             my %config = $service.param('configuration');
-            return App::Papierlos::Unprocessed.new(
+            return App::Papierlos::DataStore.new(
                 :base-path(%config<store><unprocessed>.IO)
             );
         }
+    };
+    service 'unprocessed' => {
+        :lifecycle<Singelton>,
+        :type(App::Papierlos::Unprocessed),
+        dependencies => {
+            'datastore' => 'unprocessed-store'
+        },
     };
 
     # service 'project-base-dirs' => {
@@ -80,16 +87,17 @@ our $Container is export = container 'papierlos' => contains {
         :lifecycle('Singleton'),
         dependencies => {
             'configuration' => 'configuration',
-            'unprocessed-store' => 'unprocessed-store',
+            'unprocessed' => 'unprocessed',
         },
         block => sub ($service, --> App::Papierlos::Projects) {
             my %config = $service.param('configuration');
-            my $unprocessed = $service.param('unprocessed-store');
+            my $unprocessed = $service.param('unprocessed');
 
             my %projects = gather for %config<projects>.kv -> $name, $project-settings {
+                my $datastore = App::Papierlos::DataStore.new( :base-path(%config<store><projects>.IO.add($name)) );
                 take $name => App::Papierlos::Project.new(
                     :$name,
-                    base-path => %config<store><projects>.IO.add($name),
+                    :$datastore,
                     subdir-structure => $project-settings<subdir-structure>.flat,
                 );
             }
@@ -121,5 +129,5 @@ our $Container is export = container 'papierlos' => contains {
     #         my %projects = $service.param('projects');
     #         App::Papierlos::WebApp::run(%projects);
     #     }
-    # };
+    # }; 
 };

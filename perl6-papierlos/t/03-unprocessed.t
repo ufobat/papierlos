@@ -12,12 +12,10 @@ my $file1 = $tempdir.IO.add('file1.txt');
 $file1.spurt('yada yada');
 ok $file1.e, 'file1.txt was created';
 
-my $unprocessed = App::Papierlos::Unprocessed.new(
-    :base-path( $tempdir.IO )
-);
+my $datastore = App::Papierlos::DataStore.new( :base-path( $tempdir.IO ) );
+my $unprocessed = App::Papierlos::Unprocessed.new( :$datastore );
 
-my @contents = eager $unprocessed.list-contents;
-
+my @contents = eager $datastore.list-contents;
 diag @contents;
 is @contents.elems, 1, 'one item available';
 isa-ok @contents[0], IO::Path, 'it is a file';
@@ -43,7 +41,7 @@ ok !$file1.e, 'file1.txt was removed';
 my $pdf-file = $tempdir.IO.add('test.pdf');
 $pdf-file.spurt( get-resource('DEMO-PDF-Datei.pdf').slurp(:bin) );
 ok $pdf-file.e, 'demo pdf exists';
-diag $unprocessed.list-contents;
+diag $datastore.list-contents;
 @all = $unprocessed.get-all();
 is @all.elems, 1, 'found one item';
 @id = |@all[0]<path>;

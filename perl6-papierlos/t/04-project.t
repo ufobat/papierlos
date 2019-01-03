@@ -17,9 +17,10 @@ $pdf-dir.mkdir();
 $pdf-file.spurt( get-resource('DEMO-PDF-Datei.pdf').slurp(:bin) );
 ok $pdf-file.e, 'der igel.pdf was created';
 
+my $datastore = App::Papierlos::DataStore.new(:base-path($tempdir.IO));
 my $project = App::Papierlos::Project.new(
     :name<test-project>,
-    :base-path( $tempdir.IO ),
+    :$datastore,
     :subdir-structure<jahr fach>,
 );
 
@@ -28,7 +29,7 @@ my (@all, @id);
 diag @all;
 diag "----";
 
-my @contents = eager $project.list-contents: ('2019', 'deutsch', 'der igel');
+my @contents = eager $datastore.list-contents: ('2019', 'deutsch', 'der igel');
 diag @contents;
 diag '----';
 

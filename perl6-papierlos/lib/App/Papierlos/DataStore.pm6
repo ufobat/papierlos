@@ -2,8 +2,9 @@ use v6.c;
 
 # read only data source
 use IO::Path::ChildSecure;
+use StrictClass;
 
-unit role App::Papierlos::DataStore;
+unit class App::Papierlos::DataStore does StrictClass;
 
 has IO::Path $.base-path is required;
 

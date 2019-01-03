@@ -22,8 +22,14 @@ isa-ok(
 
 isa-ok(
     $Container.resolve('unprocessed-store'),
-    App::Papierlos::Unprocessed,
+    App::Papierlos::DataStore,
     'resolved unprocessed-store',
+);
+
+isa-ok(
+    $Container.resolve('unprocessed'),
+    App::Papierlos::Unprocessed,
+    'resolved unprocessed',
 );
 
 # isa-ok(
