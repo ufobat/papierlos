@@ -6,11 +6,41 @@ use App::Papierlos::Yaml;
 
 use StrictClass;
 
-class App::Papierlos::Project does App::Papierlos::DataStore does StrictClass {
-    has Str $.name is required;
-    has Str @.subdir-structure is required;
+unit class App::Papierlos::Project does App::Papierlos::DataStore does StrictClass;
 
+has Str $.name is required;
+has Str @.subdir-structure is required;
+
+sub to-preview($file) {
+    my $name = $file.basename ~ '.jpg';
+    my $parent = $file.parent;
+    return $parent.add($name);
 }
+sub to-web-response(@path, IO $path) {
+    my $name = $path.basename;
+    my $type = 'dir' if $path.d;
+    my $size = 0;
+    if $path.f {
+        $type = 'file',
+        $size = $path.s;
+    };
+    return unless $type;
+    return {
+        :$type,
+        :$name,
+        :$size,
+        :path(|@path, $name),
+    };
+}
+
+multi method get-all( --> Seq) {
+    self.get-all(Array[Str].new);
+}
+multi method get-all(@path --> Seq) {
+    my &convert = &to-web-response.assuming(@path);
+    return self.list-contents(@path).map(&convert).grep(*.so);
+}
+
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
 #     has Str @.subdir-structure is required;
