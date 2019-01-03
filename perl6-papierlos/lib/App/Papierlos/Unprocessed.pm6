@@ -41,7 +41,8 @@ method get-details(@path --> Hash) {
     return {
         name => $file.basename,
         size => $file.s,
-        :path(@path),
+        :path(@path.List),
+        :type<file>,
     };
 }
 

@@ -36,7 +36,7 @@ ok %details<size>:exists, 'details contain a size';
 is %details<size>, 9, 'size is 9';
 is %details<path>, @id, 'it is the same id';
 
-#is-deeply %all{@id[0]}, %details, 'information about all contains same details';
+is-deeply @all[0], %details, 'information about all contains same details';
 
 $file1.unlink;
 ok !$file1.e, 'file1.txt was removed';
