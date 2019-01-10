@@ -5,5 +5,5 @@ use v6.c;
 unit module App::Papierlos::Resources;
 
 sub get-resource(Str $id) is export {
-    return %?RESOURCES{$id};
+    return %?RESOURCES{$id}.IO;
 }

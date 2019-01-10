@@ -1,40 +1,41 @@
 use v6;
 use Test;
-use File::Temp;
+use Temp::Path;
 
 use App::Papierlos::Project;
 use App::Papierlos::Resources;
 
 # create one file
 # should be unlinked by default when programm exists.
-my $tempdir = tempdir();
-my $pdf-dir = $tempdir.IO.add('2019/deutsch/der igel');
-my $pdf-file = $pdf-dir.add('der igel.pdf');
-diag $pdf-dir.perl;
-diag $pdf-file.perl;
-
-$pdf-dir.mkdir();
-$pdf-file.spurt( get-resource('DEMO-PDF-Datei.pdf').slurp(:bin) );
-ok $pdf-file.e, 'der igel.pdf was created';
-
-my $datastore = App::Papierlos::DataStore.new(:base-path($tempdir.IO));
+my $base-path = make-temp-dir;
+my $datastore = App::Papierlos::DataStore.new: :$base-path;
 my $project = App::Papierlos::Project.new(
     :name<test-project>,
     :$datastore,
-    :subdir-structure<jahr fach>,
+    :subdir-structure<jahr fach>
 );
 
-my (@all, @id);
+my (@all, @path, %details);
+
+@path = ('2019', 'deutsch', 'der igel', 'der igel.pdf');
+$datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf') );
+
 @all = $project.get-all();
-diag @all;
-diag "----";
+is @all.elems, 1,  'found one item - dir';
+%details = @all[0];
+is %details<type>, 'dir', 'it is a dir';
 
-my @contents = eager $datastore.list-contents: ('2019', 'deutsch', 'der igel');
-diag @contents;
-diag '----';
+# test details??
+# %details = $project.get-details(@path);
 
-@all = $project.get-all: ('2019', 'deutsch', 'der igel');
-diag @all;
+@path.pop; # remove file from @path
+
+@all = $project.get-all: @path;
+is @all.elems, 1, 'found one item - file';
+%details = @all[0];
+is %details<type>, 'file', 'it is a file';
+
+# %details = $project.get-details(@path);
 
 done-testing;
 
