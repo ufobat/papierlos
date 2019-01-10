@@ -9,11 +9,15 @@ unit class App::Papierlos::DataStore does StrictClass;
 has IO::Path $.base-path is required;
 
 method add-content(@name, $content) {
-    die 'no file name specified' unless @name.elems < 0;
+    die "no file name specified {{ @name }}" if @name.elems < 0;
     my $file = $.base-path;
-    $file = $file.&child-secure: $_ for (@name);
-    my $dir = $file.parent;
-    unless $dir.e { $dir.mkdir }
+    my $dir;
+    for @name {
+        $dir = $file;
+        $dir.mkdir unless $dir.e;
+        $file = $file.&child-secure: $_;
+    }
+
     given $content {
         when IO {
             $content.copy($file, :createonly);
