@@ -2,7 +2,8 @@ use v6.c;
 
 use IoC;
 use YAMLish;
-use App::Papierlos::Project;
+use App::Papierlos::Project::Flat;
+use App::Papierlos::Project::Structured;
 use App::Papierlos::Projects;
 use App::Papierlos::Cro::Routes;
 use App::Papierlos::Cro::Runner;
@@ -61,7 +62,7 @@ our $Container is export = container 'papierlos' => contains {
     };
     service 'unprocessed' => {
         :lifecycle<Singelton>,
-        :type(App::Papierlos::Unprocessed),
+        :type(App::Papierlos::Project::Flat),
         dependencies => {
             'datastore' => 'unprocessed-store'
         },
@@ -95,7 +96,7 @@ our $Container is export = container 'papierlos' => contains {
 
             my %projects = gather for %config<projects>.kv -> $name, $project-settings {
                 my $datastore = App::Papierlos::DataStore.new( :base-path(%config<store><projects>.IO.add($name)) );
-                take $name => App::Papierlos::Project.new(
+                take $name => App::Papierlos::Project::Structured.new(
                     :$name,
                     :$datastore,
                     subdir-structure => $project-settings<subdir-structure>.flat,

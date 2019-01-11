@@ -2,17 +2,18 @@ use v6;
 use Test;
 use Temp::Path;
 
-use App::Papierlos::Unprocessed;
+use App::Papierlos::Project::Flat;
 use App::Papierlos::Resources;
 
 # create one file
 # should be unlinked by default when programm exists.
 my $base-path = make-temp-dir;
 my $datastore = App::Papierlos::DataStore.new: :$base-path;
-my $unprocessed = App::Papierlos::Unprocessed.new( :$datastore );
+my $unprocessed = App::Papierlos::Project::Flat.new( :$datastore );
 
-my @all;
-my @path = ('file1.txt');
+my (@all, @path);
+
+@path = ('file1.txt');
 $datastore.add-content(@path, 'yada yada');
 
 @all = $unprocessed.get-all();

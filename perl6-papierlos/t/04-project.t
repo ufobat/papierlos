@@ -2,14 +2,14 @@ use v6;
 use Test;
 use Temp::Path;
 
-use App::Papierlos::Project;
+use App::Papierlos::Project::Structured;
 use App::Papierlos::Resources;
 
 # create one file
 # should be unlinked by default when programm exists.
 my $base-path = make-temp-dir;
 my $datastore = App::Papierlos::DataStore.new: :$base-path;
-my $project = App::Papierlos::Project.new(
+my $project = App::Papierlos::Project::Structured.new(
     :name<test-project>,
     :$datastore,
     :subdir-structure<jahr fach>

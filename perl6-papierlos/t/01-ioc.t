@@ -1,7 +1,8 @@
 use v6.c;
 use Test;
 use App::Papierlos::IoC;
-use App::Papierlos::Unprocessed;
+use App::Papierlos::Project::Flat;
+use App::Papierlos::Project::Structured;
 use App::Papierlos::Cro::Routes;
 use App::Papierlos::Cro::Runner;
 use Cro::HTTP::Router;
@@ -28,7 +29,7 @@ isa-ok(
 
 isa-ok(
     $Container.resolve('unprocessed'),
-    App::Papierlos::Unprocessed,
+    App::Papierlos::Project::Flat,
     'resolved unprocessed',
 );
 

@@ -1,12 +1,10 @@
 use v6.c;
-use App::Papierlos::DataStore;
+use App::Papierlos::Project;
 use StrictClass;
 use Digest::MD5;
 use MagickWand;
 
-unit class App::Papierlos::Unprocessed does StrictClass;
-
-has App::Papierlos::DataStore $.datastore is required;
+unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
 
 sub to-preview($file) {
     my $name = $file.basename ~ '.jpg';
