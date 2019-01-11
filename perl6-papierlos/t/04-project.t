@@ -20,7 +20,7 @@ my (@all, @path, %details);
 @path = ('2019', 'deutsch', 'der igel', 'der igel.pdf');
 $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf') );
 
-@all = $project.get-all();
+@all = $project.get-structure();
 is @all.elems, 1,  'found one item - dir';
 %details = @all[0];
 is %details<type>, 'dir', 'it is a dir';
@@ -30,7 +30,7 @@ is %details<type>, 'dir', 'it is a dir';
 
 @path.pop; # remove file from @path
 
-@all = $project.get-all: @path;
+@all = $project.get-structure: @path;
 is @all.elems, 1, 'found one item - file';
 %details = @all[0];
 is %details<type>, 'file', 'it is a file';

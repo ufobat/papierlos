@@ -32,13 +32,20 @@ sub to-web-response(@path, IO $path) {
     };
 }
 
-multi method get-all( --> Seq) {
-    self.get-all(Array[Str].new);
+multi method get-structure( --> Seq) {
+    self.get-structure(Array[Str].new);
 }
-multi method get-all(@path --> Seq) {
+multi method get-structure(@path --> Seq) {
     my &convert = &to-web-response.assuming(@path);
     return $.datastore.list-contents(@path).map(&convert).grep(*.so);
 }
+
+method add-pdf(Blob $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
+
+method get-details(@path) { ... }
+method get-preview(@path --> Blob) { ... }
+method get-pdf(@path --> Blob){ ... }
+method get-fields(@path --> Hash) { ... }
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
 #     has Str @.subdir-structure is required;

@@ -28,12 +28,21 @@ sub to-web-response(@path, IO $path) {
     };
 }
 
-multi method get-all( --> Seq) {
-    self.get-all(Array[Str].new);
+multi method get-structure( --> Seq) {
+    self.get-structure(Array[Str].new);
 }
-multi method get-all(@path --> Seq) {
+multi method get-structure(@path --> Seq) {
     my &convert = &to-web-response.assuming(@path);
     return $.datastore.list-contents(@path).map(&convert).grep(*.so);
+}
+
+method add-pdf(Blob $content, :%fields, Str :$extracted-text, Blob :$preview --> Array) {
+    # there are no %fields or $extracted-text jet
+    # implement only when neccesary
+    # die 'can only store pdfs' unless @path[*-1] ~~ m:i/ '.pdf' $ /;
+    ...
+    # my @path;
+    # $.datastore.add-content(@path, $content);
 }
 
 method get-details(@path --> Hash) {
@@ -67,7 +76,5 @@ method get-preview(@path --> Blob) {
     return $jpg.slurp(:bin)
 }
 
-method add-new-pdf(@path, Blob $content) {
-    die 'can only store pdfs' unless @path[*-1] ~~ m:i/ '.pdf' $ /;
-    $.datastore.add-content(@path, $content);
-}
+method get-pdf(@path --> Blob){ ... }
+method get-fields(@path --> Hash) { ... }

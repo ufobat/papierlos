@@ -16,7 +16,7 @@ my (@all, @path);
 @path = ('file1.txt');
 $datastore.add-content(@path, 'yada yada');
 
-@all = $unprocessed.get-all();
+@all = $unprocessed.get-structure();
 is @all.elems, 1, 'found one item';
 @path = |@all[0]<path>;
 
@@ -31,7 +31,7 @@ is-deeply @all[0], %details, 'information about all contains same details';
 @path = ('test.pdf');
 $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf'));
 
-@all = $unprocessed.get-all();
+@all = $unprocessed.get-structure();
 is @all.elems, 2, 'found two item';
 @path = |@all[1]<path>;
 my $image-blob = $unprocessed.get-preview(@path);
