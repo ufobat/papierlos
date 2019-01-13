@@ -6,34 +6,21 @@ use MagickWand;
 
 unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
 
-sub to-preview($file) {
-    my $name = $file.basename ~ '.jpg';
-    my $parent = $file.parent;
-    return $parent.add($name);
-}
-sub to-web-response(@path, IO $path) {
-    my $name = $path.basename;
-    my $type = 'dir' if $path.d;
-    my $size = 0;
-    if $path.f {
-        $type = 'file',
-        $size = $path.s;
-    };
-    return unless $type;
-    return {
-        :$type,
-        :$name,
-        :$size,
-        :path(|@path, $name),
-    };
-}
+sub convert-to-node(@path is copy, IO $path) {
+    given $path {
+        my $name = $path.basename;
+        @path.push($name);
+        when .d { return node 'dir',     :$name, :@path }
+        when .f { return node 'file',    :$name, :@path, :size($path.s) }
+        default { return node 'unknown', :$name, :@path }
+    }
+};
 
-multi method get-structure( --> Seq) {
-    self.get-structure(Array[Str].new);
+multi method get-children( --> Seq) {
+    self.get-children(Array.new);
 }
-multi method get-structure(@path --> Seq) {
-    my &convert = &to-web-response.assuming(@path);
-    return $.datastore.list-contents(@path).map(&convert).grep(*.so);
+multi method get-children(@path --> Seq) {
+    return $.datastore.list-contents(@path).map: &convert-to-node.assuming(@path)
 }
 
 method add-pdf(Blob $content, :%fields, Str :$extracted-text, Blob :$preview --> Array) {
@@ -45,19 +32,14 @@ method add-pdf(Blob $content, :%fields, Str :$extracted-text, Blob :$preview -->
     # $.datastore.add-content(@path, $content);
 }
 
-method get-details(@path --> Hash) {
+method get-node-details(@path --> Hash) {
     my $file = $.datastore.get-content(@path);
-    return {
-        name => $file.basename,
-        size => $file.s,
-        :path(@path.List),
-        :type<file>,
-    };
+    return convert-to-node(@path[0..^*], $file);
 }
 
 method get-preview(@path --> Blob) {
     my $file = $.datastore.get-content(@path);
-    my $jpg = to-preview($file);
+    my $jpg = $file.parent.add($file.basename ~ '.jpg');
     unless $jpg.e {
         my $w = MagickWand.new;
         LEAVE {

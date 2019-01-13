@@ -16,11 +16,11 @@ my (@all, @path);
 @path = ('file1.txt');
 $datastore.add-content(@path, 'yada yada');
 
-@all = $unprocessed.get-structure();
+@all = $unprocessed.get-children();
 is @all.elems, 1, 'found one item';
-@path = |@all[0]<path>;
+is-deeply @all[0]<path>, @path, 'correct path';
 
-my %details = $unprocessed.get-details(@path);
+my %details = $unprocessed.get-node-details(@path);
 isa-ok %details, Hash, "found details for {{ @path.perl }}";
 ok %details<name>:exists, 'details contain a name';
 ok %details<size>:exists, 'details contain a size';
@@ -31,7 +31,7 @@ is-deeply @all[0], %details, 'information about all contains same details';
 @path = ('test.pdf');
 $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf'));
 
-@all = $unprocessed.get-structure();
+@all = $unprocessed.get-children();
 is @all.elems, 2, 'found two item';
 @path = |@all[1]<path>;
 my $image-blob = $unprocessed.get-preview(@path);

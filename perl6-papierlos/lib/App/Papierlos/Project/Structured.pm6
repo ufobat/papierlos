@@ -10,39 +10,33 @@ unit class App::Papierlos::Project::Structured does StrictClass does App::Papier
 has Str $.name is required;
 has Str @.subdir-structure is required;
 
-sub to-preview($file) {
-    my $name = $file.basename ~ '.jpg';
-    my $parent = $file.parent;
-    return $parent.add($name);
-}
-sub to-web-response(@path, IO $path) {
+sub convert-to-node(@path is copy, IO $path) {
     my $name = $path.basename;
-    my $type = 'dir' if $path.d;
-    my $size = 0;
-    if $path.f {
-        $type = 'file',
-        $size = $path.s;
-    };
-    return unless $type;
-    return {
-        :$type,
-        :$name,
-        :$size,
-        :path(|@path, $name),
-    };
-}
 
-multi method get-structure( --> Seq) {
-    self.get-structure(Array[Str].new);
+    if $path.d and (my $pdf-file = $path.add($name ~ '.pdf')).e {
+        return node 'file', :$name, :@path, :size($pdf-file.s);
+    } elsif $path.d {
+        @path.push: $name;
+        return node 'dir', :$name, :@path;
+    } elsif $path.f {
+        # skip them
+        return;
+    } else {
+        @path.push: $name;
+        return node 'unknown', :$name, :@path;
+    }
+};
+
+multi method get-children( --> Seq) {
+    self.get-children(Array[Str].new);
 }
-multi method get-structure(@path --> Seq) {
-    my &convert = &to-web-response.assuming(@path);
-    return $.datastore.list-contents(@path).map(&convert).grep(*.so);
+multi method get-children(@path --> Seq) {
+    return $.datastore.list-contents(@path).map(&convert-to-node.assuming(@path)).grep(so *);
 }
 
 method add-pdf(Blob $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
 
-method get-details(@path) { ... }
+method get-node-details(@path) { ... }
 method get-preview(@path --> Blob) { ... }
 method get-pdf(@path --> Blob){ ... }
 method get-fields(@path --> Hash) { ... }
