@@ -16,25 +16,34 @@ my (@all, @path);
 @path = ('file1.txt');
 $datastore.add-content(@path, 'yada yada');
 
-@all = $unprocessed.get-children();
-is @all.elems, 1, 'found one item';
-is-deeply @all[0]<path>, @path, 'correct path';
+subtest {
+    @all = $unprocessed.get-children();
+    is @all.elems, 1, 'found one item';
+    is-deeply @all[0]<path>, @path, 'correct path';
 
-my %details = $unprocessed.get-node-details(@path);
-isa-ok %details, Hash, "found details for {{ @path.perl }}";
-ok %details<name>:exists, 'details contain a name';
-ok %details<size>:exists, 'details contain a size';
-is %details<size>, 9, 'size is 9';
-is %details<path>, @path, 'it is the same id';
-is-deeply @all[0], %details, 'information about all contains same details';
+    # FIXME: do not use $datestore but use the $unprocessed in oder to add.
+    @path = ('test.pdf');
+    $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf'));
 
-@path = ('test.pdf');
-$datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf'));
+    @all = $unprocessed.get-children();
+    is @all.elems, 2, 'found two item';
+}, 'get-children';
 
-@all = $unprocessed.get-children();
-is @all.elems, 2, 'found two item';
-@path = |@all[1]<path>;
-my $image-blob = $unprocessed.get-preview(@path);
-ok $image-blob.defined, 'got a preview image';
+subtest {
+    @path = ('file1.txt');
+    my %details = $unprocessed.get-node-details(@path);
+    isa-ok %details, Hash, "found details for {{ @path.perl }}";
+    ok %details<name>:exists, 'details contain a name';
+    ok %details<size>:exists, 'details contain a size';
+    is %details<size>, 9, 'size is 9';
+    is %details<path>, @path, 'it is the same id';
+    is-deeply @all[0], %details, 'information about all contains same details';
+}, 'get-node-details';
+
+subtest {
+    @path = ('test.pdf');
+    my $image-blob = $unprocessed.get-preview(@path);
+    ok $image-blob.defined, 'got a preview image';
+}, 'get-preview';
 
 done-testing;

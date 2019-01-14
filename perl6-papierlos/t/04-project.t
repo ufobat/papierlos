@@ -17,35 +17,39 @@ my $project = App::Papierlos::Project::Structured.new(
 
 my (@all, @path, %details);
 
+# add test data
 @path = ('2019', 'deutsch', 'der igel', 'der igel.pdf');
 $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf') );
 
-@path = ();
-@all = $project.get-children(@path);
-is @all.elems, 1,  'found one item';
-%details = @all[0];
-is %details<type>, 'dir', 'it is a dir';
-is %details<name>, '2019', 'found year: 2019';
+subtest {
+    @path = ();
+    @all = $project.get-children(@path);
+    is @all.elems, 1,  'found one item';
+    %details = @all[0];
+    is %details<type>, 'dir', 'it is a dir';
+    is %details<name>, '2019', 'found year: 2019';
 
-@path = ('2019');
-@all = $project.get-children(@path);
-is @all.elems, 1,  'found one item';
-%details = @all[0];
-is %details<type>, 'dir', 'it is a dir';
-is %details<name>, 'deutsch', 'found fach: deutsch';
+    @path = ('2019');
+    @all = $project.get-children(@path);
+    is @all.elems, 1,  'found one item';
+    %details = @all[0];
+    is %details<type>, 'dir', 'it is a dir';
+    is %details<name>, 'deutsch', 'found fach: deutsch';
 
-@path = ('2019', 'deutsch');
-@all = $project.get-children(@path);
-is @all.elems, 1,  'found one item';
-%details = @all[0];
-is %details<type>, 'file', 'it is a file';
-is %details<name>, 'der igel', 'found pdf document: der igel';
+    @path = ('2019', 'deutsch');
+    @all = $project.get-children(@path);
+    is @all.elems, 1,  'found one item';
+    %details = @all[0];
+    is %details<type>, 'file', 'it is a file';
+    is %details<name>, 'der igel', 'found pdf document: der igel';
+}, 'get-children';
 
-# test details
-# @path = ('2019', 'deutsch', 'der igel');
-# %details = $project.get-node-details(@path);
-# is %details<type>, 'file', 'it is a file';
-# is %details<name>, 'der igel', 'found pdf document: der igel';
+# subtest {
+    # @path = ('2019', 'deutsch', 'der igel');
+    # %details = $project.get-node-details(@path);
+    # is %details<type>, 'file', 'it is a file';
+    # is %details<name>, 'der igel', 'found pdf document: der igel';
+# }, 'get-node-details';
 
 done-testing;
 
