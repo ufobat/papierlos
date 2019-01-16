@@ -1,20 +1,29 @@
 use v6.c;
 use App::Papierlos::Project;
+use App::Papierlos::Types;
+
 use StrictClass;
 use Digest::MD5;
 use MagickWand;
 
 unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
 
+# which contains path
 sub convert-to-node(@path is copy, IO $path) {
     given $path {
-        my $name = $path.basename;
+        my $name = .basename;
+        $name ~~ s/ '.pdf' $ // if $path.f;
         @path.push($name);
         when .d { return node 'dir',     :$name, :@path }
         when .f { return node 'file',    :$name, :@path, :size($path.s) }
         default { return node 'unknown', :$name, :@path }
     }
 };
+
+sub path-to-pdf(@path is copy --> Array) {
+    @path[*-1] ~= '.pdf';
+    return @path;
+}
 
 multi method get-children( --> Seq) {
     self.get-children(Array.new);
@@ -23,22 +32,24 @@ multi method get-children(@path --> Seq) {
     return $.datastore.list-contents(@path).map: &convert-to-node.assuming(@path)
 }
 
-method add-pdf(Blob $content, :%fields, Str :$extracted-text, Blob :$preview --> Array) {
+method add-pdf(EntryName $name, $content, :%fields, Str :$extracted-text, Blob :$preview --> Array) {
     # there are no %fields or $extracted-text jet
     # implement only when neccesary
-    # die 'can only store pdfs' unless @path[*-1] ~~ m:i/ '.pdf' $ /;
-    ...
-    # my @path;
-    # $.datastore.add-content(@path, $content);
+    my @path = [$name];
+    my @pdf-path = path-to-pdf(@path);
+    $.datastore.add-content(@pdf-path, $content);
+    return @path;
 }
 
 method get-node-details(@path --> Hash) {
-    my $file = $.datastore.get-content(@path);
+    my @pdf-path = path-to-pdf(@path);
+    my $file = $.datastore.get-content(@pdf-path);
     return convert-to-node(@path[0..^*], $file);
 }
 
 method get-preview(@path --> Blob) {
-    my $file = $.datastore.get-content(@path);
+    my @pdf-path = path-to-pdf(@path);
+    my $file = $.datastore.get-content(@pdf-path);
     my $jpg = $file.parent.add($file.basename ~ '.jpg');
     unless $jpg.e {
         my $w = MagickWand.new;

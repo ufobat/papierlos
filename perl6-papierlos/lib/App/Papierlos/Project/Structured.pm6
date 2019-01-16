@@ -34,7 +34,7 @@ multi method get-children(@path --> Seq) {
     return $.datastore.list-contents(@path).map(&convert-to-node.assuming(@path)).grep(so *);
 }
 
-method add-pdf(Blob $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
+method add-pdf(Str $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
 
 method get-node-details(@path) { ... }
 method get-preview(@path --> Blob) { ... }

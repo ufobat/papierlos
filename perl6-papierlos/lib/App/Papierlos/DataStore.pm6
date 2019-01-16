@@ -40,6 +40,6 @@ multi method list-contents(@path --> Seq) {
 method get-content(@path --> IO::Path) {
     my $file = $.base-path;
     $file = $file.&child-secure: $_ for @path;
-    die "can not get-content for { @path }" unless $file.f;
+    die "did not find content with get-content for '{ @path }" unless $file.f;
     return $file;
 }

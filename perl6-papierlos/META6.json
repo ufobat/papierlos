@@ -12,7 +12,8 @@
     "StrictClass",
     "Shell::Command",
     "Digest::MD5",
-    "MagickWand"
+    "MagickWand",
+    "Subset::Helper"
   ],
   "description" : "blah blah blah",
   "license" : "Artistic-2.0",

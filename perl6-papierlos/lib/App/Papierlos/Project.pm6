@@ -1,6 +1,7 @@
 use v6.c;
 
 use App::Papierlos::DataStore;
+use App::Papierlos::Types;
 
 unit role App::Papierlos::Project;
 
@@ -16,7 +17,7 @@ method get-pdf(@path --> Blob){ ... }
 method get-fields(@path --> Hash) { ... }
 
 # projects decide depending on the %fields where to put the PDF document
-method add-pdf(Blob $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
+method add-pdf(EntryName $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
 
 # works for all @paths
 # die on @path = () because we don't need that.
@@ -45,3 +46,4 @@ multi sub node('unknown', Str :$name!, :@path! --> Hash) is export {
         :@path,
     };
 }
+

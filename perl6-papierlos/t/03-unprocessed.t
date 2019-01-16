@@ -13,24 +13,19 @@ my $unprocessed = App::Papierlos::Project::Flat.new( :$datastore );
 
 my (@all, @path);
 
-@path = ('file1.txt');
+@path = ('file1.pdf');
 $datastore.add-content(@path, 'yada yada');
 
 subtest {
     @all = $unprocessed.get-children();
     is @all.elems, 1, 'found one item';
+    @path = ('file1');
     is-deeply @all[0]<path>, @path, 'correct path';
 
-    # FIXME: do not use $datestore but use the $unprocessed in oder to add.
-    @path = ('test.pdf');
-    $datastore.add-content(@path, get-resource('DEMO-PDF-Datei.pdf'));
-
-    @all = $unprocessed.get-children();
-    is @all.elems, 2, 'found two item';
 }, 'get-children';
 
 subtest {
-    @path = ('file1.txt');
+    @path = ('file1');
     my %details = $unprocessed.get-node-details(@path);
     isa-ok %details, Hash, "found details for {{ @path.perl }}";
     ok %details<name>:exists, 'details contain a name';
@@ -41,9 +36,21 @@ subtest {
 }, 'get-node-details';
 
 subtest {
-    @path = ('test.pdf');
+    lives-ok {
+        $unprocessed.add-pdf('test', get-resource('DEMO-PDF-Datei.pdf'));
+    }, 'added test';
+    @all = $unprocessed.get-children();
+    is @all.elems, 2, 'found two items';
+}, 'add-pdf';
+
+subtest {
+    @path = ('test');
     my $image-blob = $unprocessed.get-preview(@path);
     ok $image-blob.defined, 'got a preview image';
 }, 'get-preview';
+
+## TODO
+# get-pdf
+# get-fields
 
 done-testing;
