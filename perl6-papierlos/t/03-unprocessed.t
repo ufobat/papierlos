@@ -45,12 +45,22 @@ subtest {
 
 subtest {
     @path = ('test');
-    my $image-blob = $unprocessed.get-preview(@path);
-    ok $image-blob.defined, 'got a preview image';
+    my $image = $unprocessed.get-preview(@path);
+    ok $image.defined, 'got a preview image';
+    isa-ok $image, IO::Path, 'is an IO::Path';
 }, 'get-preview';
 
-## TODO
-# get-pdf
-# get-fields
+subtest {
+    @path = ('test');
+    my $pdf = $unprocessed.get-pdf(@path);
+    ok $pdf.defined, 'got a pdf file';
+    isa-ok $pdf, IO::Path, 'is an IO::Path';
+}, 'get-pdf';
+
+subtest {
+    @path = ('test');
+    my %fields = $unprocessed.get-fields(@path);
+    %fields.elems, 0, 'there are no fields in the flat/unrpcessed store';
+}, 'get-fields';
 
 done-testing;

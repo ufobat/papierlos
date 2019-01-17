@@ -5,6 +5,7 @@ use App::Papierlos::Types;
 use StrictClass;
 use Digest::MD5;
 use MagickWand;
+use JSON::Fast;
 
 unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
 
@@ -47,9 +48,8 @@ method get-node-details(@path --> Hash) {
     return convert-to-node(@path[0..^*], $file);
 }
 
-method get-preview(@path --> Blob) {
-    my @pdf-path = path-to-pdf(@path);
-    my $file = $.datastore.get-content(@pdf-path);
+method get-preview(@path --> IO::Path) {
+    my $file = self.get-pdf(@path);
     my $jpg = $file.parent.add($file.basename ~ '.jpg');
     unless $jpg.e {
         my $w = MagickWand.new;
@@ -66,8 +66,17 @@ method get-preview(@path --> Blob) {
         }
     }
     die 'preview file was not generated' unless $jpg.e;
-    return $jpg.slurp(:bin)
+    return $jpg;
 }
 
-method get-pdf(@path --> Blob){ ... }
-method get-fields(@path --> Hash) { ... }
+method get-pdf(@path --> IO::Path){ 
+    my @pdf-path = path-to-pdf(@path);
+    my $file = $.datastore.get-content(@pdf-path);
+    return $file;
+}
+method get-fields(@path --> Hash) {
+    my $file = self.get-pdf(@path);
+    my $fields = $file.parent.add($file.basename ~ '_fields.json');
+    my %fields = $fields.e ?? from-json($fields.slurp) !! ();
+    return %fields;
+}

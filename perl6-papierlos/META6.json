@@ -13,7 +13,8 @@
     "Shell::Command",
     "Digest::MD5",
     "MagickWand",
-    "Subset::Helper"
+    "Subset::Helper",
+    "JSON::Fast"
   ],
   "description" : "blah blah blah",
   "license" : "Artistic-2.0",

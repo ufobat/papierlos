@@ -12,8 +12,8 @@ multi method get-children( --> Seq ) { ... } # same as @path = ();
 multi method get-children(@path --> Seq) { ... }
 
 # @path is a "leaf", die if not.
-method get-preview(@path --> Blob) { ... }
-method get-pdf(@path --> Blob){ ... }
+method get-preview(@path --> IO::Path) { ... }
+method get-pdf(@path --> IO::Path) { ... }
 method get-fields(@path --> Hash) { ... }
 
 # projects decide depending on the %fields where to put the PDF document
@@ -24,7 +24,7 @@ method add-pdf(EntryName $name, $content, :%fields, Str :$extraced-text, Blob :$
 method get-node-details(@path) { ... }
 
 # factory sub for different nodes in the tree
-multi sub node('file', Str :$name!, :@path!, Int :$size --> Hash ) is export {
+multi sub node('file', Str :$name!, :@path!, Int :$size --> Hash) is export {
     return {
         :type<file>,
         :$name,
@@ -46,4 +46,3 @@ multi sub node('unknown', Str :$name!, :@path! --> Hash) is export {
         :@path,
     };
 }
-
