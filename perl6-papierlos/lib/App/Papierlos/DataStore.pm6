@@ -8,7 +8,7 @@ unit class App::Papierlos::DataStore does StrictClass;
 
 has IO::Path $.base-path is required;
 
-method add-content(@name, $content) {
+method add-content(@name, $content --> IO::Path) {
     die "no file name specified {{ @name }}" if @name.elems < 0;
     my $file = $.base-path;
     my $dir;
@@ -26,6 +26,7 @@ method add-content(@name, $content) {
             $file.spurt($content, :createonly);
         }
     }
+    return $file;
 }
 
 multi method list-contents(--> Seq) {

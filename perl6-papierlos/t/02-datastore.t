@@ -12,13 +12,15 @@ ok $base-path.e, 'temp dir was created';
 ok $datastore, 'got a datastore';
 
 # list contents without parameters
-my (@content, @path);
+my (@content, @path, $file);
 @content = $datastore.list-contents();
 is @content.elems, 0, 'it is empty';
 
 # add-content with Str
 @path = <foo bar>;
-$datastore.add-content(@path, 'yada bar');
+$file = $datastore.add-content(@path, 'yada bar');
+isa-ok $file, IO::Path, 'got a io::path';
+
 @content = $datastore.list-contents();
 is @content.elems, 1, 'contains one element';
 is @content[0].basename, 'foo', 'foo element';
@@ -26,7 +28,8 @@ is @content[0].basename, 'foo', 'foo element';
 # add-content with IO::Path;
 my $tempfile = make-temp-path :content('yada baz');
 @path = <foo baz>;
-$datastore.add-content(@path, $tempfile);
+$file = $datastore.add-content(@path, $tempfile);
+isa-ok $file, IO::Path, 'got a io::path';
 
 # list again
 @path = ('foo');
