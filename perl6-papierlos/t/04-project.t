@@ -44,6 +44,8 @@ subtest {
     is %details<name>, 'der igel', 'found pdf document: der igel';
 }, 'get-children';
 
+# maybe unlink that manually added file again.
+
 subtest {
     @path = ('2019', 'deutsch', 'der igel');
     diag $project.get-node-details(@path);
@@ -51,6 +53,17 @@ subtest {
     is %details<type>, 'file', 'it is a file';
     is %details<name>, 'der igel', 'found pdf document: der igel';
 }, 'get-node-details';
+
+subtest {
+    my $pdf = get-resource('DEMO-PDF-Datei.pdf');
+    $project.add-pdf('Die Bedeutung des Waldes', $pdf, :fields{ :jahr(2019), :fach<HSU>, :schwierigkeit<einfach> } );
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    diag $project.get-node-details(@path);
+}, 'add-pdf';
+
+# TODO: subtest {}, 'get-preview';
+# TODO: subtest {}, 'get-pdf';
+# TODO: subtest {}, 'get-fields';
 
 done-testing;
 

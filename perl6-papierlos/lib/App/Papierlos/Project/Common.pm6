@@ -16,3 +16,9 @@ sub generate-preview(Str $name, IO::Path $pdf, IO::Path $jpg) is export {
             die "could not create preview for $name";
         }   
 }
+
+
+sub generate-plaintext(IO::Path $pdf --> Str) is export {
+    warn 'generate-plaintext is not yet implemented';
+    return "not yet implemented";
+}
