@@ -1,10 +1,11 @@
 use v6.c;
 use App::Papierlos::Project;
 use App::Papierlos::Types;
+use App::Papierlos::Project::Common;
 
 use StrictClass;
 use Digest::MD5;
-use MagickWand;
+
 use JSON::Fast;
 
 unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
@@ -52,18 +53,8 @@ method get-preview(@path --> IO::Path) {
     my $file = self.get-pdf(@path);
     my $jpg = $file.parent.add($file.basename ~ '.jpg');
     unless $jpg.e {
-        my $w = MagickWand.new;
-        LEAVE {
-            $w.cleanup if $w.defined;
-        }
-        unless
-            $w.read($file.absolute) and
-            $w.adaptive-resize(0.25) and
-            $w.write($jpg.absolute)
-        {
-            my $name = @path.join: '/';
-            die "could not create preview for $name";
-        }
+        my $name = @path.join: '/';
+        generate-preview($name, $file, $jpg);
     }
     die 'preview file was not generated' unless $jpg.e;
     return $jpg;

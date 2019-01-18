@@ -2,6 +2,7 @@ use v6.c;
 
 use App::Papierlos::Project;
 use App::Papierlos::Yaml;
+use App::Papierlos::Project::Common;
 
 use StrictClass;
 
@@ -33,6 +34,12 @@ sub path-to-pdf(@path is copy --> Array) {
     return @path;
 }
 
+sub path-to-preview(@path is copy --> Array) {
+    my $filename = @path[*-1] ~ '.jpg';
+    push @path, $filename;
+    return @path;
+}
+
 multi method get-children( --> Seq) {
     self.get-children(Array[Str].new);
 }
@@ -48,8 +55,22 @@ method get-node-details(@path --> Hash) {
     my %details = convert-to-node(@path, $pdf-dir);
     return %details;
 }
-method get-preview(@path --> IO::Path) { ... }
-method get-pdf(@path --> IO::Path){ ... }
+method get-preview(@path --> IO::Path) {
+    my @preview-path = path-to-preview(@path);
+    my $jpg = $.datastore.get-content: @preview-path;
+    unless $jpg.e {
+        my $pdf = self.get-pdf;
+        my $name = @path.join: '/';
+        generate-preview($name, $pdf, $jpg);
+    }
+    die 'preview file was not generated' unless $jpg.e;
+    return $jpg;
+}
+method get-pdf(@path --> IO::Path){
+    my @pdf-path = path-to-pdf(@path);
+    my $file = $.datastore.get-content: @pdf-path, :f;
+    return $file;
+}
 method get-fields(@path --> Hash) { ... }
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
