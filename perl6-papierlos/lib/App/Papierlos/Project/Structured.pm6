@@ -27,6 +27,12 @@ sub convert-to-node(@path is copy, IO $path) {
     }
 };
 
+sub path-to-pdf(@path is copy --> Array) {
+    my $filename = @path[*-1] ~ '.pdf';
+    push @path, $filename;
+    return @path;
+}
+
 multi method get-children( --> Seq) {
     self.get-children(Array[Str].new);
 }
@@ -36,9 +42,14 @@ multi method get-children(@path --> Seq) {
 
 method add-pdf(Str $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
 
-method get-node-details(@path) { ... }
-method get-preview(@path --> Blob) { ... }
-method get-pdf(@path --> Blob){ ... }
+method get-node-details(@path --> Hash) {
+    my @pdf-path = path-to-pdf(@path);
+    my $pdf-dir = $.datastore.get-content(@path);
+    my %details = convert-to-node(@path, $pdf-dir);
+    return %details;
+}
+method get-preview(@path --> IO::Path) { ... }
+method get-pdf(@path --> IO::Path){ ... }
 method get-fields(@path --> Hash) { ... }
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {

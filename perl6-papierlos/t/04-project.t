@@ -44,12 +44,13 @@ subtest {
     is %details<name>, 'der igel', 'found pdf document: der igel';
 }, 'get-children';
 
-# subtest {
-    # @path = ('2019', 'deutsch', 'der igel');
-    # %details = $project.get-node-details(@path);
-    # is %details<type>, 'file', 'it is a file';
-    # is %details<name>, 'der igel', 'found pdf document: der igel';
-# }, 'get-node-details';
+subtest {
+    @path = ('2019', 'deutsch', 'der igel');
+    diag $project.get-node-details(@path);
+    %details = $project.get-node-details(@path);
+    is %details<type>, 'file', 'it is a file';
+    is %details<name>, 'der igel', 'found pdf document: der igel';
+}, 'get-node-details';
 
 done-testing;
 

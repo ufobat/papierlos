@@ -44,7 +44,7 @@ method add-pdf(EntryName $name, $content, :%fields, Str :$extracted-text, Blob :
 
 method get-node-details(@path --> Hash) {
     my @pdf-path = path-to-pdf(@path);
-    my $file = $.datastore.get-content(@pdf-path);
+    my $file = $.datastore.get-content: @pdf-path, :f;
     return convert-to-node(@path[0..^*], $file);
 }
 
@@ -71,7 +71,7 @@ method get-preview(@path --> IO::Path) {
 
 method get-pdf(@path --> IO::Path){ 
     my @pdf-path = path-to-pdf(@path);
-    my $file = $.datastore.get-content(@pdf-path);
+    my $file = $.datastore.get-content: @pdf-path, :f;
     return $file;
 }
 method get-fields(@path --> Hash) {

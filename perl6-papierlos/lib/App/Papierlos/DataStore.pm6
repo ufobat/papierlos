@@ -37,9 +37,11 @@ multi method list-contents(@path --> Seq) {
     return $dir.dir;
 }
 
-method get-content(@path --> IO::Path) {
+method get-content(@path, Bool :$f = False --> IO::Path) {
     my $file = $.base-path;
     $file = $file.&child-secure: $_ for @path;
-    die "did not find content with get-content for '{ @path }" unless $file.f;
+    if $f {
+        die "did not find a file with get-content for '{ @path }" unless $file.f;
+    }
     return $file;
 }

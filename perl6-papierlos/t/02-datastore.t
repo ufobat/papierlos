@@ -43,9 +43,19 @@ ok $io, 'got data';
 is $io.slurp, 'yada bar', 'got correct content';
 
 @path = <foo baz>;
-$io = $datastore.get-content(@path);
+$io = $datastore.get-content(@path, :f);
 ok $io, 'got data';
 is $io.slurp, 'yada baz', 'got correct content';
+
+@path = ('foo');
+$io = $datastore.get-content(@path);
+ok $io, "got data";
+ok $io.d, 'got correct content';
+
+dies-ok {
+    $datastore.get-content(@path, :f);
+}, 'dies if you ask for a file with a path of a directory';
+
 
 # remove content?
 
