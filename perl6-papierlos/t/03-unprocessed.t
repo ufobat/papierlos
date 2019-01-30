@@ -45,9 +45,11 @@ subtest {
 
 subtest {
     @path = ('test');
-    my $image = $unprocessed.get-preview(@path);
-    ok $image.defined, 'got a preview image';
-    isa-ok $image, IO::Path, 'is an IO::Path';
+    my @image = $unprocessed.get-preview(@path);
+    ok @image.elems > 0, 'got a preview images';
+    for @image -> $image {
+        isa-ok $image, IO::Path, 'is an IO::Path';
+    }
 }, 'get-preview';
 
 subtest {

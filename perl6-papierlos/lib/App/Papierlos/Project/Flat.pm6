@@ -49,18 +49,15 @@ method get-node-details(@path --> Hash) {
     return convert-to-node(@path[0..^*], $file);
 }
 
-method get-preview(@path --> IO::Path) {
+method get-preview(@path --> Seq) {
     my $file = self.get-pdf(@path);
-    my $jpg = $file.parent.add($file.basename ~ '.jpg');
-    unless $jpg.e {
-        my $name = @path.join: '/';
-        generate-preview($name, $file, $jpg);
-    }
-    die 'preview file was not generated' unless $jpg.e;
-    return $jpg;
+    my @jpgs = list-preview($file.parent, $file.basename);
+    @jpgs = generate-preview($file) unless @jpgs;
+    die 'preview file was not generated' unless @jpgs;
+    return @jpgs.Seq;
 }
 
-method get-pdf(@path --> IO::Path){ 
+method get-pdf(@path --> IO::Path){
     my @pdf-path = path-to-pdf(@path);
     my $file = $.datastore.get-content: @pdf-path, :f;
     return $file;

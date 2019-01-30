@@ -13,7 +13,7 @@ multi method get-children(@path --> Seq) { ... }
 
 # @path is a "leaf", die if not.
 method get-preview(@path --> IO::Path) { ... }
-method get-pdf(@path --> IO::Path) { ... }
+method get-pdf(@path --> Seq) { ... }
 method get-fields(@path --> Hash) { ... }
 
 # projects decide depending on the %fields where to put the PDF document
