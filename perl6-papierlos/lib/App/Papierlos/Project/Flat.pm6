@@ -68,3 +68,6 @@ method get-fields(@path --> Hash) {
     my %fields = $fields.e ?? from-json($fields.slurp) !! ();
     return %fields;
 }
+method get-extracted-text(@path --> IO::Path) {
+...
+}

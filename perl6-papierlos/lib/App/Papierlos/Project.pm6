@@ -12,9 +12,10 @@ multi method get-children( --> Seq ) { ... } # same as @path = ();
 multi method get-children(@path --> Seq) { ... }
 
 # @path is a "leaf", die if not.
-method get-preview(@path --> IO::Path) { ... }
-method get-pdf(@path --> Seq) { ... }
+method get-preview(@path --> Seq) { ... }
+method get-pdf(@path --> IO::Path) { ... }
 method get-fields(@path --> Hash) { ... }
+method get-extracted-text(@path --> IO::Path) { ... }
 
 # projects decide depending on the %fields where to put the PDF document
 method add-pdf(EntryName $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }

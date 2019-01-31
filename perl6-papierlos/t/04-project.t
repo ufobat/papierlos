@@ -54,56 +54,36 @@ subtest {
     is %details<name>, 'der igel', 'found pdf document: der igel';
 }, 'get-node-details';
 
+my %fields = ( :jahr(2019), :fach<HSU>, :schwierigkeit<einfach> );
+
 subtest {
     my $pdf = get-resource('DEMO-PDF-Datei.pdf');
-    $project.add-pdf('Die Bedeutung des Waldes', $pdf, :fields{ :jahr(2019), :fach<HSU>, :schwierigkeit<einfach> } );
+    $project.add-pdf('Die Bedeutung des Waldes', $pdf, :%fields );
     @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
     diag $project.get-node-details(@path);
 }, 'add-pdf';
 
-# TODO: subtest {}, 'get-preview';
-# TODO: subtest {}, 'get-pdf';
-# TODO: subtest {}, 'get-fields';
+subtest {
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    my @images = $project.get-preview(@path);
+    ok @images.elems > 0, 'get preview images';
+    diag @images;
+    for @images -> $image {
+        isa-ok $image, IO::Path, 'is an IO::Path';
+    }
+}, 'get-preview';
 
-done-testing;
+subtest {
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    my $pdf = $project.get-pdf(@path);
+    ok $pdf.defined, 'got a pdf file';
+    isa-ok $pdf, IO::Path, 'is an IO::Path';
+}, 'get-pdf';
 
-=finish
-
-my @contents = eager $unprocessed.list-contents;
-
-diag @contents;
-is @contents.elems, 1, 'one item available';
-isa-ok @contents[0], IO::Path, 'it is a file';
-is @contents[0].s, 9, 'which is 9 bytes large';
-
-my (@all, @id);
-@all = $unprocessed.get-all();
-is @all.elems, 1, 'found one item';
-diag @all.perl;
-@id = |@all[0]<path>;
-
-my %details = $unprocessed.get-details(@id);
-isa-ok %details, Hash, "found details for {{ @id.perl }}";
-ok %details<name>:exists, 'details contain a name';
-ok %details<size>:exists, 'details contain a size';
-is %details<size>, 9, 'size is 9';
-is %details<path>, @id, 'it is the same id';
-
-is-deeply @all[0], %details, 'information about all contains same details';
-
-$file1.unlink;
-ok !$file1.e, 'file1.txt was removed';
-my $pdf-file = $tempdir.IO.add('test.pdf');
-$pdf-file.spurt( get-resource('DEMO-PDF-Datei.pdf').slurp(:bin) );
-ok $pdf-file.e, 'demo pdf exists';
-diag $unprocessed.list-contents;
-@all = $unprocessed.get-all();
-is @all.elems, 1, 'found one item';
-@id = |@all[0]<path>;
-my $image-blob = $unprocessed.get-preview(@id);
-ok $image-blob.defined, 'got a preview image';
-
-$pdf-file.unlink;
-ok !$pdf-file.e, 'demo pdf was removed';
+subtest {
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    my %got-fields = $project.get-fields(@path);
+    is-deeply %got-fields, %fields, 'expected fields';
+}, 'get-fields';
 
 done-testing;

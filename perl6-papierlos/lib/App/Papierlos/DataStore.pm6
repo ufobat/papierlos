@@ -29,13 +29,13 @@ method add-content(@name, $content --> IO::Path) {
     return $file;
 }
 
-multi method list-contents(--> Seq) {
-    return self.list-contents(Array[Str].new);
+multi method list-contents(:$test--> Seq) {
+    return self.list-contents(Array[Str].new, |(:$test with $test));
 }
-multi method list-contents(@path --> Seq) {
+multi method list-contents(@path, :$test --> Seq) {
     my $dir = $.base-path;
     $dir = $dir.&child-secure: $_ for @path;
-    return $dir.dir;
+    return $dir.dir: |(:$test with $test);
 }
 
 method get-content(@path, Bool :$f = False --> IO::Path) {

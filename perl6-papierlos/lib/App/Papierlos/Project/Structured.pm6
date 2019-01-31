@@ -34,12 +34,6 @@ sub path-to-pdf(@path is copy --> Array) {
     return @path;
 }
 
-sub path-to-preview(@path is copy --> Array) {
-    my $filename = @path[*-1] ~ '.jpg';
-    push @path, $filename;
-    return @path;
-}
-
 sub path-to-fields(@path is copy --> Array) {
     my $filename = @path[*-1] ~ '.yml';
     push @path, $filename;
@@ -92,16 +86,12 @@ method get-node-details(@path --> Hash) {
     my %details = convert-to-node(@path, $pdf-dir);
     return %details;
 }
-method get-preview(@path --> IO::Path) {
-    my @preview-path = path-to-preview(@path);
-    my $jpg = $.datastore.get-content: @preview-path;
-    unless $jpg.e {
-        my $pdf = self.get-pdf;
-        my $name = @path.join: '/';
-        generate-preview($name, $pdf, $jpg);
-    }
-    die 'preview file was not generated' unless $jpg.e;
-    return $jpg;
+method get-preview(@path --> Seq) {
+    my $file = self.get-pdf(@path);
+    my @jpgs = list-preview($file.parent, $file.basename);
+    @jpgs = generate-preview($file) unless @jpgs;
+    die 'preview file was not generated' unless @jpgs;
+    return @jpgs.Seq;
 }
 method get-pdf(@path --> IO::Path){
     my @pdf-path = path-to-pdf(@path);
@@ -113,6 +103,10 @@ method get-fields(@path --> Hash) {
     my $file = $.datastore.get-content: @fields-path, :f;
     return load-yaml($file.slurp);
 }
+method get-extracted-text(@path --> IO::Path) {
+...
+}
+
 
 # class App::Papierlos::Project::BaseDir does App::Papierlos::DataSource does StrictClass {
 #     has Str @.subdir-structure is required;
