@@ -28,4 +28,7 @@ ENV PATH=$PATH:/opt/rakudo/bin:/opt/rakudo/share/perl6/site/bin
 RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get -y install tesseract-ocr sane sane-utils
+    # convert
+    # ghostscript
+    # readme
 
