@@ -33,7 +33,7 @@ isa-ok $file, IO::Path, 'got a io::path';
 
 # list again
 @path = ('foo');
-@content = $datastore.list-contents(@path);
+@content = sort $datastore.list-contents(@path);
 is @content.elems, 2, 'foo contains 2 elements';
 is @content[0].basename, 'bar', 'bar';
 is @content[1].basename, 'baz', 'baz';
