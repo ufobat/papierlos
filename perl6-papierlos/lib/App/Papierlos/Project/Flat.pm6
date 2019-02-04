@@ -4,9 +4,7 @@ use App::Papierlos::Types;
 use App::Papierlos::Project::Common;
 
 use StrictClass;
-use Digest::MD5;
-
-use JSON::Fast;
+use YAMLish;
 
 unit class App::Papierlos::Project::Flat does StrictClass does App::Papierlos::Project;
 
@@ -24,6 +22,14 @@ sub convert-to-node(@path is copy, IO $path) {
 
 sub path-to-pdf(@path is copy --> Array) {
     @path[*-1] ~= '.pdf';
+    return @path;
+}
+sub path-to-plaintext(@path is copy --> Array) {
+    @path[*-1] ~= '.txt';
+    return @path;
+}
+sub path-to-fields(@path is copy --> Array) {
+    @path[*-1] ~= '.yml';
     return @path;
 }
 
@@ -62,12 +68,21 @@ method get-pdf(@path --> IO::Path){
     my $file = $.datastore.get-content: @pdf-path, :f;
     return $file;
 }
+
 method get-fields(@path --> Hash) {
-    my $file = self.get-pdf(@path);
-    my $fields = $file.parent.add($file.basename ~ '_fields.json');
-    my %fields = $fields.e ?? from-json($fields.slurp) !! ();
+    my @fields-path = path-to-fields(@path);
+    my $file = $.datastore.get-content: @fields-path;
+    my %fields = $file.e ?? load-yaml($file.slurp) !! ();
     return %fields;
 }
-method get-extracted-text(@path --> IO::Path) {
-...
+
+method get-plaintext(@path --> IO::Path) {
+    my @plain-path = path-to-plaintext(@path);
+    my $plaintext-file = $.datastore.get-content(@plain-path);
+    unless $plaintext-file.e {
+        my $pdf-file = self.get-pdf(@path);
+        my $plain-text = generate-plaintext($pdf-file);
+        $.datastore.add-content(@plain-path, $plain-text);
+    }
+    return $plaintext-file;
 }

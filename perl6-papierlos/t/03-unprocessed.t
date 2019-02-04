@@ -65,4 +65,12 @@ subtest {
     %fields.elems, 0, 'there are no fields in the flat/unrpcessed store';
 }, 'get-fields';
 
+# this will create the plaintext file, because it isnt created at add-pdf();
+subtest {
+    @path = ('test');
+    my $file = $unprocessed.get-plaintext(@path);
+    ok $file.e, 'plaintext file exists';
+    ok $file.s > 0, 'plaintext contains some chars';
+}, 'get-plaintest';
+
 done-testing;

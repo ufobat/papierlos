@@ -86,4 +86,22 @@ subtest {
     is-deeply %got-fields, %fields, 'expected fields';
 }, 'get-fields';
 
+subtest {
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    my $file = $project.get-plaintext(@path);
+    ok $file.e, 'plaintext file exists';
+    ok $file.s > 0, 'plaintext contains some chars';
+}, 'get-plaintest';
+
+# subtest {
+#     my $project2 = App::Papierlos::Project::Structured.new(
+#         :name<test2-project>,
+#         datastore => App::Papierlos::DataStore.new(base-path => make-temp-dir),
+#         :subdir-structure<jahr fach>
+#     );
+
+#     #$project.move(:@path, to => $project2);
+
+# }, 'move to another project';
+
 done-testing;

@@ -103,8 +103,9 @@ method get-fields(@path --> Hash) {
     my $file = $.datastore.get-content: @fields-path, :f;
     return load-yaml($file.slurp);
 }
-method get-extracted-text(@path --> IO::Path) {
-...
+method get-plaintext(@path --> IO::Path) {
+    my @plain-path = path-to-plaintext(@path);
+    return $.datastore.get-content(@plain-path, :f);
 }
 
 
