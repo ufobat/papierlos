@@ -2,6 +2,8 @@ use v6.c;
 
 use App::Papierlos::Project;
 use App::Papierlos::Project::Common;
+use App::Papierlos::Types;
+use Subsets::IO;
 
 use YAMLish;
 use StrictClass;
@@ -53,7 +55,10 @@ multi method get-children(@path --> Seq) {
     return $.datastore.list-contents(@path).map(&convert-to-node.assuming(@path)).grep(so *);
 }
 
-method add-pdf(Str $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) {
+multi method add-pdf(EntryName $name, $content, :%fields, IO::Path::e :$plaintext, :@preview --> Array) {
+    self.add-pdf($name, $content, :%fields, plaintext => $plaintext.slurp, :@preview);
+}
+multi method add-pdf(EntryName $name, $content, :%fields, Str :$plaintext, :@preview --> Array) {
     # ensure needed %fields where provided.
     my @path;
     for @.subdir-structure -> $name {
@@ -73,9 +78,8 @@ method add-pdf(Str $name, $content, :%fields, Str :$extraced-text, Blob :$previe
     $.datastore.add-content(@fields-path, $fields);
 
     # Store EXTRACTED PLAIN TEXT
-    my $plain-text = generate-plaintext($pdf-file);
     my @plain-path = path-to-plaintext(@path);
-    $.datastore.add-content(@plain-path, $plain-text);
+    $.datastore.add-content(@plain-path, $plaintext // generate-plaintext($pdf-file));
 
     return @path;
 }
@@ -106,6 +110,15 @@ method get-fields(@path --> Hash) {
 method get-plaintext(@path --> IO::Path) {
     my @plain-path = path-to-plaintext(@path);
     return $.datastore.get-content(@plain-path, :f);
+}
+
+method move(@path, App::Papierlos::Project :$to! --> Array) {
+    my $name = @path[*-1];
+    my $pdf = self.get-pdf(@path);
+    my %fields = self.get-fields(@path);
+    my $plaintext = self.get-plaintext(@path);
+    my @preview = self.get-preview(@path);
+    return $to.add-pdf($name, $pdf, :%fields, :$plaintext, :@preview);
 }
 
 

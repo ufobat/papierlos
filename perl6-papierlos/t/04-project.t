@@ -93,15 +93,26 @@ subtest {
     ok $file.s > 0, 'plaintext contains some chars';
 }, 'get-plaintest';
 
-# subtest {
-#     my $project2 = App::Papierlos::Project::Structured.new(
-#         :name<test2-project>,
-#         datastore => App::Papierlos::DataStore.new(base-path => make-temp-dir),
-#         :subdir-structure<jahr fach>
-#     );
+subtest {
+    @path = ('2019', 'HSU', 'Die Bedeutung des Waldes');
+    my $project2 = App::Papierlos::Project::Structured.new(
+        :name<test2-project>,
+        datastore => App::Papierlos::DataStore.new(base-path => make-temp-dir),
+        :subdir-structure<jahr fach>
+    );
 
-#     #$project.move(:@path, to => $project2);
+    my @path2 = $project.move(@path, to => $project2);
+    ok @path2.elems > 0, 'move successful';
 
-# }, 'move to another project';
+    my $pdf1 =$project.get-pdf(@path);
+    my $pdf2 =$project2.get-pdf(@path2);
+
+    ok $pdf1.s == $pdf2.s, 'same size';
+    ok $pdf1.slurp(:bin) eqv $pdf2.slurp(:bin), 'same data';
+    ok $project.get-fields(@path) eqv $project2.get-fields(@path2);
+    ok $project.get-preview(@path).elems == $project2.get-preview(@path2).elems;
+    ok $project.get-plaintext(@path).slurp eq $project2.get-plaintext(@path2).slurp;
+
+}, 'move to another project';
 
 done-testing;

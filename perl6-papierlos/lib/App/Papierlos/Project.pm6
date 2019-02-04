@@ -2,6 +2,7 @@ use v6.c;
 
 use App::Papierlos::DataStore;
 use App::Papierlos::Types;
+use Subsets::IO;
 
 unit role App::Papierlos::Project;
 
@@ -18,7 +19,8 @@ method get-fields(@path --> Hash) { ... }
 method get-plaintext(@path --> IO::Path) { ... }
 
 # projects decide depending on the %fields where to put the PDF document
-method add-pdf(EntryName $name, $content, :%fields, Str :$extraced-text, Blob :$preview --> Array) { ... }
+multi method add-pdf(EntryName $name, $content, :%fields, IO::Path::e :$plaintext, :@preview --> Array) { ... }
+multi method add-pdf(EntryName $name, $content, :%fields, Str :$plaintext, :@preview --> Array) { ... }
 
 # works for all @paths
 # die on @path = () because we don't need that.

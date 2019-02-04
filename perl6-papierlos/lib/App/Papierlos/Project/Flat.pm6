@@ -39,8 +39,10 @@ multi method get-children( --> Seq) {
 multi method get-children(@path --> Seq) {
     return $.datastore.list-contents(@path).map: &convert-to-node.assuming(@path)
 }
-
-method add-pdf(EntryName $name, $content, :%fields, Str :$extracted-text, Blob :$preview --> Array) {
+multi method add-pdf(EntryName $name, $content, :%fields, IO::Path :$plaintext, :@preview --> Array) {
+    self.add-pdf($name, $content, :%fields, plaintext => $plaintext.slurp, :@preview);
+}
+multi method add-pdf(EntryName $name, $content, :%fields, Str :$plaintext, :@preview --> Array) {
     # there are no %fields or $extracted-text jet
     # implement only when neccesary
     my @path = [$name];
