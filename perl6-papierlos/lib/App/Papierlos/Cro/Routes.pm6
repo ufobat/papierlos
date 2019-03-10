@@ -16,59 +16,64 @@ method get-routes(--> Cro::HTTP::Router::RouteSet) {
 
 method !get-api-routes(--> Cro::HTTP::Router::RouteSet) {
     route {
+        include 'unprocessed' => self!get-unprocessed-routes();
+        include 'projects' => self!get-projects-routes();
         get -> {
             content 'text/plain', 'this is a test';
         }
-        get -> 'unprocessed' {
+    }
+}
+
+method !get-projects-routes() {
+    route {
+        get -> $name, 'structure', *@path {
+        }
+        get -> $name, 'pdf', *@path {
+        }
+        get -> $name, 'details', *@path {
+        }
+        get -> $name, 'preview', *@path {
+        }
+        post -> $name, 'search' {
+            # query_string
+        }
+    }
+}
+
+method !get-unprocessed-routes() {
+    route {
+        get -> {
             content 'application/json', $.unprocessed.get-all();
         }
-        get -> 'unprocessed', 'details', *@id {
-            content 'application/json', $.unprocessed.get-details(@id);
+        get -> 'structure', *@path {
         }
-        get -> 'unprocessed', 'preview', *@id {
-            content 'image/jpeg', $.unprocessed.get-preview(@id);
+        post -> 'pdf' {
+            # fileupload
+        }
+        get -> 'pdf', *@path {
+        }
+        get -> 'details', *@path {
+            content 'application/json', $.unprocessed.get-details(@path);
+        }
+        get -> 'preview', *@path {
+            content 'image/jpeg', $.unprocessed.get-preview(@path);
+        }
+        post -> 'store', *@path {
+            # returns location string header
+            # with parameters:
+            # 'fields' : {
+            #     'key' : 'value' ...
+            # }
+            # 'project': $project-name
         }
     }
 }
 
 method !get-resource-routes() {
     route {
-        get ->  *@path {
+        # get -> { static-resource('index.html') }
+        get -> *@path {
             static-resource(|@path, :indexes(<index.html>));
         }
     }
 }
-
-# Will be part of Cro in future releases / PR was accepted.
-sub static-resource(*@path, :$mime-types, :@indexes) is export {
-    my $resp = $*CRO-ROUTER-RESPONSE //
-    die X::Cro::HTTP::Router::OnlyInHandler.new(:what<route>);
-
-    my $path = @path.grep(*.so).join: '/';
-    my %fallback = $mime-types // {};
-
-    sub get-mime($ext) {
-        %mime{$ext} // %fallback{$ext} // 'application/octet-stream';
-    }
-
-    sub get-extension($path --> Str) {
-        my $ext = ($path ~~ m/ '.' ( <-[ \. ]>+ ) $ / );
-        return $ext[0].Str;
-    }
-
-    if $path and my $resource = %?RESOURCES{$path} and $resource.IO.e {
-        content get-mime(get-extension($path)), slurp($resource, :bin);
-    } else {
-        for @indexes {
-            my $index = ($path, $_).grep(*.so).join: '/';
-            my $resource = %?RESOURCES{$index};
-            if $resource.IO.e {
-                content get-mime(get-extension($index)), slurp($resource, :bin);
-                last;
-            }
-        }
-    }
-
-    $resp.status //= 404;
-}
-
