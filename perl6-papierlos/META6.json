@@ -15,6 +15,7 @@
     "StrictClass",
     "Subset::Helper",
     "Subsets::IO",
+    "Temp::Path",
     "YAMLish"
   ],
   "description" : "blah blah blah",
