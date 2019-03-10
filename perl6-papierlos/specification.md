@@ -14,27 +14,28 @@
 
 # REST API
 ## unprocessed
-* GET  /unprocessed/structure/<*@path>
-* POST /unprocessed/pdf/
+* GET  /api/unprocessed/  # get all
+* GET  /api/unprocessed/structure/<*@path>
+* POST /api/unprocessed/pdf/
     - with fileupload
-* GET  /unprocessed/pdf/<$id>
-* GET  /unprocessed/details/<$id>
-* GET  /unprocessed/preview/<$id>
-* POST /unprocessed/store/<$id> 
+* GET  /api/unprocessed/pdf/<$id>
+* GET  /api/unprocessed/details/<$id>
+* GET  /api/unprocessed/preview/<$id>
+* POST /api/unprocessed/store/<$id>
     # returns Location header!?
     - with: {
-        'tags': { # can be used to retag
+        'fields: { # can be used to retag
             'key': 'value-pairs',
         },
         'project': '<$name>', # can be used to change the project
     }
 ## projects
-* GET /projects
-* GET /projects/<$name>/structure/<*@path>
-* GET /projects/<$name>/pdf/<$id>
-* GET /projects/<$name>/details/<$id>
-* GET /projects/<$name>/preview/<$id>
-* POST /projects/<$name>/search
+* GET  /api/projects
+* GET  /api/projects/<$name>/structure/<*@path>
+* GET  /api/projects/<$name>/pdf/<$id>
+* GET  /api/projects/<$name>/details/<$id>
+* GET  /api/projects/<$name>/preview/<$id>
+* POST /api/projects/<$name>/search
     - with {
         'query': 'query-string'
     }
@@ -48,7 +49,7 @@ method list-contents(Str @path --> Seq) { ... }
 ## DataStore does DataSource
 ```
 multi method add-content(Str @path, StrOrBlob $content) { ... }
-multi method add-content(Str @path, IO $content) { ... } 
+multi method add-content(Str @path, IO $content) { ... }
 method del-content(Str @path) { ... }
 ```
 
